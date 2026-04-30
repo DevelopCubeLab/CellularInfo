@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+
+HELPER="/usr/local/bin/CellularInfoRootHelper"
+
+if [ -f "$HELPER" ]; then
+    chown root:wheel "$HELPER"
+    chmod 4755 "$HELPER"
+fi
+
+exit 0

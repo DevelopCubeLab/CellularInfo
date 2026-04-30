@@ -1,0 +1,9 @@
+Package: com.developlab.cellularinforoothelper
+Name: CellularInfoRootHelper
+Version: 1.0
+Architecture: iphoneos-arm
+Description: Cellular information Root Helper
+Maintainer: developlab
+Author: developlab
+Section: Utilities
+Depends: firmware (>= 12.0)

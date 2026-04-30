@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>platform-application</key>
+	<true/>
+	<key>com.apple.private.security.no-sandbox</key>
+	<true/>
+	<key>com.apple.private.persona-mgmt</key>
+	<true/>
+	<key>com.apple.private.security.storage.AppDataContainers</key>
+	<true/>
+	<key>com.apple.security.exception.iokit-user-client-class</key>
+	<array>
+		<string>IOAccelerator</string>
+		<string>IOGPUDeviceUserClient</string>
+		<string>IOSurfaceRootUserClient</string>
+	</array>
+	<key>com.apple.CommCenter.fine-grained</key>
+	<array>
+		<string>spi</string>
+		<string>internal</string>
+    	<string>preferences-write</string>
+		<string>preferences-reset</string>
+		<string>cellular-plan</string>
+		<string>carrier-settings</string>
+		<string>public-cellular-plan</string>
+		<string>public-subscriber-info</string>
+		<string>connection-assistant</string>
+		<string>bootstrap-service</string>
+		<string>data-allowed</string>
+		<string>data-allowed-write</string>
+	</array>
+	<key>com.apple.private.MobileGestalt.AllowedProtectedKeys</key>
+	<array>
+		<string>InternationalMobileEquipmentIdentity</string>
+    	<string>InternationalMobileEquipmentIdentity2</string>
+		<string>MobileEquipmentIdentifier</string>
+		<string>MobileEquipmentInfoDisplayCSN</string>
+		<string>BasebandUniqueId</string>
+	</array>
+	<key>com.apple.private.security.storage.MobileDocuments</key>
+	<true/>
+	<key>com.apple.private.security.storage.CarrierBundles</key>
+	<true/>
+	<key>com.apple.security.exception.files.absolute-path.read-write</key>
+	<array>
+		<string>/var/wireless/Library/Preferences</string>
+		<string>/var/wireless/Library/Preferences/com.apple.commcenter.device_specific_nobackup.plist</string>
+	</array>
+</dict>
+</plist>
