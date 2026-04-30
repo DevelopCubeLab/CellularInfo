@@ -9,7 +9,7 @@
   </a>
 </p>
 
-[简体中文 ➡️](https://github.com/DevelopCubeLab/CellularInfo/README_Zh.md)  
+[简体中文 ➡️](https://github.com/DevelopCubeLab/CellularInfo/blob/main/README_Zh.md)  
 
 ## Introduction
 
@@ -50,8 +50,8 @@ To help protect your device data security, do not download installation packages
 | iOS 12.2 - iOS 13.x | Jailbreak installation | Requires separate RootHelper installation |
 | iOS 12.0 - iOS 12.1.x | Jailbreak installation | Requires an IPA compatible with iOS 12.0 and separate RootHelper installation |
 ## How It Works
+<img width="800" alt="How CellularInfo Works" src="https://github.com/user-attachments/assets/ff6a0a16-7445-42af-a15a-905b47d24635" />
 
-IMAGE
 ## Data
 
 ### 1. The following features require iOS 17.0 or later.
