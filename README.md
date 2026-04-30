@@ -32,6 +32,21 @@ This tool is mainly intended for developers, security researchers, and advanced 
 
 To help protect your device data security, do not download installation packages for this project from unofficial sources, and do not share app data with others unless it is properly protected.
 
+If you are interested in CoreTelephony, you can directly browse the organized source files below:
+
+[`CoreTelephonyClient.h`](https://github.com/DevelopCubeLab/CellularInfo/blob/main/CellularInfo/Head/CoreTelephonyClient.h)  
+[`CoreTelephonyController.swift`](https://github.com/DevelopCubeLab/CellularInfo/blob/main/CellularInfo/Controller/CoreTelephonyController.swift)  
+[`CellularDataController.swift`](https://github.com/DevelopCubeLab/CellularInfo/blob/main/CellularInfo/Controller/CellularDataController.swift)
+
+These files include status descriptions, comments, and documented error cases.
+
+Most comments in the source code are written in Chinese, but you can easily translate them using translation tools or LLMs.
+
+Related IPCC installation implementation:
+
+[`IPCCManagerController.m`](https://github.com/DevelopCubeLab/CellularInfo/blob/main/CellularInfo/Controller/IPCCManagerController.m)  
+[`IPCCManagerController.swift`](https://github.com/DevelopCubeLab/CellularInfo/blob/main/CellularInfo/Controller/IPCCManagerController.swift)
+
 > [!NOTE]
 > Some professional cellular network terms and technical details in this app may not be fully accurate, as certain areas are still being researched and verified.  
 > If you are a telecom or networking professional and notice any incorrect information in the app, please feel free to submit an issue. Corrections and improvements are always welcome.

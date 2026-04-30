@@ -27,6 +27,15 @@
 
 本工具主要面向开发者、安全研究人员以及对 iOS 蜂窝网络机制有深入需求的高级用户。为了保证您的设备数据安全，请勿在非官方来源下载此项目的安装包，app内的数据请勿在未受保护的情况下发送给他人。
 
+如果您对CoreTelephony感兴趣，可以直接查看整理好的  [`CoreTelephonyClient.h`](https://github.com/DevelopCubeLab/CellularInfo/blob/main/CellularInfo/Head/CoreTelephonyClient.h)
+[`CoreTelephonyController.swift`](https://github.com/DevelopCubeLab/CellularInfo/blob/main/CellularInfo/Controller/CoreTelephonyController.swift)
+[`CellularDataController.swift`](https://github.com/DevelopCubeLab/CellularInfo/blob/main/CellularInfo/Controller/CellularDataController.swift)  
+包含了状态注释和出现错误的情况  
+
+安装IPCC的相关内容  
+[`IPCCManagerController.m`](https://github.com/DevelopCubeLab/CellularInfo/blob/main/CellularInfo/Controller/IPCCManagerController.m)
+[`IPCCManagerController.swift`](https://github.com/DevelopCubeLab/CellularInfo/blob/main/CellularInfo/Controller/IPCCManagerController.swift)
+
 > [!NOTE]
 > 由于部分蜂窝网络相关的专业术语与技术细节仍在研究与验证中，应用内可能存在不准确或错误的信息。  
 > 如果您是通信或网络相关领域的专业人士，并发现应用中的错误内容，欢迎提交 issue，我们会及时进行修正与改进。
