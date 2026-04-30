@@ -45,7 +45,7 @@
 | iOS 12.0 - iOS 12.1.x | 越狱安装 | 需要选择支持iOS 12.0的ipa文件安装，需要单独安装RootHelper | 
 
 ## 工作原理
-IMAGE
+<img width="800" alt="How CellularInfo Works" src="https://github.com/user-attachments/assets/40729eb6-c84b-4723-a948-0a69c21cc4ea" />
 
 ## 数据
 
