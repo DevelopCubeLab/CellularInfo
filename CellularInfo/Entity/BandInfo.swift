@@ -35,12 +35,12 @@ enum BandRadioAccessTechnology: Hashable {
     // 输出
     var displayName: String {
         switch self {
-        case .LTE: return "LTE"
-        case .NR: return "5G"
-        case .GSM: return "GSM"
-        case .WCDMA: return "WCDMA"
-        case .CDMA: return "CDMA"
-        case .TD_SCDMA: return "TD-SCDMA"
+        case .NR: return "5G (NR)"
+        case .LTE: return "4G (LTE)"
+        case .WCDMA: return "3G (UMTS/WCDMA)"
+        case .CDMA: return "3G (CDMA)"
+        case .TD_SCDMA: return "3G (TD-SCDMA)"
+        case .GSM: return "2G (GSM)"
         case .unknown(let raw): return raw // 原样输出
         }
     }
@@ -52,12 +52,20 @@ struct Band {
     
     var displayName: String {
         switch rat {
-        case .LTE:
-            return "B\(value)"
         case .NR:
             return "n\(value)"
-        default:
-            return "\(value)"
+        case .LTE:
+            return "B\(value)"
+        case .WCDMA:
+            return String(value)
+        case .TD_SCDMA:
+            return "TD \(value)"
+        case .CDMA:
+            return "BC\(value)"
+        case .GSM:
+            return String(value)
+        case .unknown:
+            return String(value)
         }
     }
 }

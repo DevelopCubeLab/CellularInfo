@@ -26,7 +26,7 @@ Devices without cellular capability are not supported, including iPod Touch, Wi-
 Jailbreak or TrollStore installation is required.  
 Installing via a developer certificate provides access to only a limited subset of data.
 
-This project will not support iOS versions below 12.0 because `CoreTelephonyClient` requires iOS 12.0+.
+This project will **not support** iOS versions below 12.0 because `CoreTelephonyClient` requires iOS 12.0+.
 
 This tool is mainly intended for developers, security researchers, and advanced users who require deeper insight into iOS cellular network mechanisms.
 
@@ -59,8 +59,8 @@ Related IPCC installation implementation:
 
 | System Version | Installation Method | Notes |
 |----------|------|------|
-| iOS 17.0+ devices without jailbreak support | Developer certificate sideloading ([limited data access](#10-Data accessible without extra entitlements)) | Can be installed using AltStore, SideStore, LiveContainer, LCSign, Esign, and other signing tools |
-| iOS 17.0+ jailbreakable devices (A10 / A11) | Jailbreak + TrollStore Lite | - |
+| iOS 17.3.1/iOS 18.7.2+/iOS 26.0.1+ devices without jailbreak support | Developer certificate sideloading ([limited data access](#10-Data accessible without extra entitlements)) | Can be installed using AltStore, SideStore, LiveContainer, LCSign, Esign, and other signing tools |
+| iOS 17.0+ jailbreakable devices | Jailbreak(Dopamine/Realxin/palera1n) + TrollStore Lite | - |
 | iOS 14.0 - iOS 16.6.1 and iOS 17.0 | Install using TrollStore | - |
 | iOS 12.2 - iOS 13.x | Jailbreak installation | Requires separate RootHelper installation |
 | iOS 12.0 - iOS 12.1.x | Jailbreak installation | Requires an IPA compatible with iOS 12.0 and separate RootHelper installation |
@@ -141,6 +141,7 @@ Related IPCC installation implementation:
 * Cellular Plan List **(Data retrieval fails on devices running iOS versions below 14.0)**
 * Cellular Plan Details **(Data retrieval fails on devices running iOS versions below 14.0)**
 * Enable or Disable Cellular Plan **(Data retrieval fails on devices running iOS versions below 14.0)**
+* Configure Network Bands (Beta)
 
 ### 7. The following features require iOS 13.4 or later.
 * Data Roaming **(Compatibility extended to iOS 12.0+ using an alternative method)**
@@ -233,7 +234,7 @@ Related IPCC installation implementation:
 * iOS 16.6 iPhone SE 3 (2022) **(carrier locked)**
 * iOS 16.6 iPhone 13 Pro
 * iOS 17.0 iPhone 13 mini
-* iOS 17.2 iPad 7 (2019) Wi-Fi + Cellular **(jailbroken)**
+* iOS 18.7.9 iPad 7 (2019) Wi-Fi + Cellular **(jailbroken)**
 * iOS 18.7 iPhone 16 Pro Max **(without entitlements)**
 * iOS 18.7.1 iPhone 16 Pro Max **(without entitlements)**
 * iOS 26.1 iPhone 17 Pro Max **(without entitlements)**

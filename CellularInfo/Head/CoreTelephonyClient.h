@@ -94,7 +94,7 @@ typedef struct {
 - (long long)getDualSimCapability:(NSError **)error; // 设备支持双卡情况
 - (BOOL)supportsEmbeddedSIM API_AVAILABLE(ios(16.0)); // 是否支持eSIM 需要iOS 16.0+
 - (NSNumber *)isEmbeddedSIMOnlyConfig:(NSError **)error API_AVAILABLE(ios(16.0)); // 判断是否是纯eSIM机型
-- (NSNumber *)checkEmbeddedSimHealthWithError:(NSError **)error API_AVAILABLE(ios(16.0)); // 检查eSIM健康状况
+- (NSNumber *)checkEmbeddedSimHealthWithError:(NSError **)error API_AVAILABLE(ios(16.0)) NS_SWIFT_NOTHROW; // 检查eSIM健康状况
 - (NSNumber *)isAnySimReadyWithError:(NSError **)error API_AVAILABLE(ios(16.4)); // 是否有SIM卡准备完毕 无需额外权利
 -(void)getSIMTrayStatus:(/*^block*/id)arg1; // 获取SIM卡槽状态 异步方法
 - (NSString *)getSIMTrayStatusOrError:(NSError **)error; // 获取SIM卡槽状态 同步方法
@@ -103,7 +103,7 @@ typedef struct {
 -(CTServiceDescriptorContainer *)getDescriptorsForDomain:(long long)domain error:(id*)error; // 通过domain获取CTServiceDescriptorContainer
 -(void)getDescriptorsForDomain:(long long)arg1 completion:(/*^block*/id)arg2 ;
 -(void)getActiveContextsWithCallback:(/*^block*/id)arg1 ;
-- (CTXPCServiceSubscriptionContext *)getPreferredDataSubscriptionContextSync:(id*)error; // 获取当前的数据卡context
+- (CTXPCServiceSubscriptionContext *)getPreferredDataSubscriptionContextSync:(NSError **)error; // 获取当前的数据卡context
 - (CTXPCServiceSubscriptionContext *)getUserDefaultVoiceSubscriptionContext:(NSError **)error API_AVAILABLE(ios(13.0)); // 获取默认语音号码的Context
 -(void)getCurrentDataSubscriptionContext:(/*^block*/id)arg1 ;
 -(CTXPCServiceSubscriptionContext *)getCurrentDataSubscriptionContextSync:(id*)error; // 获取当前正在使用的数据卡的context
@@ -123,7 +123,10 @@ typedef struct {
 -(NSString *)getOperatorName:(CTXPCServiceSubscriptionContext *)context error:(NSError **)error API_AVAILABLE(ios(16.0)); // 获取网络名称 跟上面的方法获取的是一样的内容
 -(void)copyOperatorName:(id)arg1 completion:(/*^block*/id)arg2 ;
 -(NSString *)getEnglishCarrierNameFor:(NSString *)operatorName error:(NSError **)error API_AVAILABLE(ios(15.0)); // 获取运营商的英文名
--(CTBandInfo *)getBandInfo:(CTXPCServiceSubscriptionContext *)context error:(NSError **)error API_AVAILABLE(ios(14.0)); // 获取基带信息
+-(CTBandInfo *)getBandInfo:(CTXPCServiceSubscriptionContext *)context error:(NSError **)error API_AVAILABLE(ios(14.0)); // 获取基带中的频段信息
+-(void)setBandInfo:(CTXPCServiceSubscriptionContext *)context bands:(CTBandInfo *)bands completion:(/*^block*/id)arg3 API_AVAILABLE(ios(14.0)); // 设置当前卡频段信息
+-(void)setActiveBandInfo:(CTXPCServiceSubscriptionContext *)context bands:(CTBandInfo *)bands error:(NSError **)error API_AVAILABLE(ios(14.0)); // 设置当前卡可用的频段信息
+-(void)copyBandInfo:(CTXPCServiceSubscriptionContext *)context completion:(/*^block*/id)arg2 ;
 -(CTNetworkSelectionInfo *)copyNetworkSelectionInfo:(CTXPCServiceSubscriptionContext *)context error:(NSError **)error; // 获取搜索运营商网络的结果
 -(CTIMSRegistrationStatus *)getIMSRegistrationStatus:(CTXPCServiceSubscriptionContext *)context error:(NSError **)error; // 获取IMS状态
 -(void)getSimLabel:(id)arg1 completion:(/*^block*/id)arg2; // 获取SIM卡标签实例 异步方法
@@ -269,7 +272,6 @@ typedef struct {
 -(long long)context:(id)arg1 supportedIdentityProtectionFor:(id)arg2 error:(id*)arg3 ;
 -(void)convertPhysicalToeSIMWithCompletionHandler:(/*^block*/id)arg1 ;
 -(void)copyAbbreviatedOperatorName:(id)arg1 completion:(/*^block*/id)arg2 ;
--(void)copyBandInfo:(id)arg1 completion:(/*^block*/id)arg2 ;
 -(void)copyCellId:(CTXPCServiceSubscriptionContext *)context completion:(/*^block*/id)arg2; // 返回cellID本身
 - (CTCellIdInfo *)copyPublicCellId:(CTServiceDescriptor *)descriptor error:(NSError **)error ; // 返回cellIdInfo 实例
 -(void)copyCellInfo:(CTXPCServiceSubscriptionContext *)context completion:(void (^)(CTCellInfo * info, NSError * error))completion; // 获取连接信息
@@ -604,11 +606,9 @@ typedef struct {
 -(id)getSIMToolkitUSSDString:(id)arg1 ussdString:(id*)arg2 needRsp:(BOOL*)arg3 ;
 -(id)cancelSIMToolkitUSSDSession:(CTXPCServiceSubscriptionContext *)context;
 -(void)sendTaggedInfo:(id)arg1 type:(unsigned long long)arg2 payload:(id)arg3 completion:(/*^block*/id)arg4 ;
--(void)setActiveBandInfo:(id)arg1 bands:(id)arg2 error:(id*)arg3 ;
 -(void)setActiveUserDataSelection:(CTXPCServiceSubscriptionContext *)context completion:(/*^block*/id)completion;
-- (void)setActiveUserDataSelection:(CTXPCServiceSubscriptionContext *)context error:(NSError **)error;
+- (void)setActiveUserDataSelection:(CTXPCServiceSubscriptionContext *)context error:(NSError **)error; // 设置默认流量卡
 -(id)setApplicationCategory:(id)arg1 API_AVAILABLE(ios(17.0));
--(void)setBandInfo:(id)arg1 bands:(id)arg2 completion:(/*^block*/id)arg3 ;
 -(void)setCoalescing:(BOOL)arg1 udp:(BOOL)arg2 completion:(/*^block*/id)arg3 ;
 -(void)setDefaultVoice:(id)arg1 completion:(/*^block*/id)arg2 ;
 -(void)setDefaultVoice:(id)arg1 error:(id*)arg2 ; // 设置默认语音号码
@@ -720,6 +720,7 @@ typedef struct {
 - (BOOL)acknowledgeIncomingMessages:(id)messages withMessageIDList:(id)idlist withError:(id *)error API_AVAILABLE(ios(18.0));
 - (void)activateCrossPlatformTransport:(unsigned long long)transport completion:(id /* block */)completion;
 - (void)activateTurboMode:(/* block */id)arg1 API_AVAILABLE(ios(18.3));
+- (id)isPrivateNetworkContext:(CTXPCServiceSubscriptionContext *)context error:(NSError **)error API_AVAILABLE(ios(18.0)); // iPad 7 蜂窝版测试提示设备不支持
 
 // 扩展CoreTelephony的方法
 typedef struct _CTServerConnection *CTServerConnectionRef;

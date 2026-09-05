@@ -3,7 +3,7 @@ import UIKit
 
 class SettingsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    static let versionCode = "1.0"
+    static let versionCode = "1.1"
     
     private var tableView = UITableView()
     private let tableCellList = [
@@ -227,6 +227,9 @@ class SettingsViewController: UIViewController, UITableViewDelegate, UITableView
         case SettingsItemID.versionCode:
             if allowClickVersionCode {
                 versionTapCount += 1
+                if !SettingsUtils.instance.getShowConfigureNetworkBands() { // 如果没有开启网络频段设置就开启
+                    SettingsUtils.instance.setShowConfigureNetworkBands(show: true)
+                }
                 if versionTapCount >= 7 {
                     versionTapCount = 0
                     if let tab = self.tabBarController as? MainUITabBarController {
@@ -320,14 +323,14 @@ class SettingsViewController: UIViewController, UITableViewDelegate, UITableView
             preferredStyle: .alert
         )
 
-        // 确定按钮 蓝色
+        // 确定按钮 红色
         let confirmAction = UIAlertAction(title: NSLocalizedString("Confirm", comment: ""), style: .destructive) { _ in
             SettingsUtils.instance.resetAllWarning()
             self.sendMessage(message: NSLocalizedString("ResetCompleted", comment: ""))
         }
 
-        // 关闭按钮 蓝色
-        let cancelAction = UIAlertAction(title: NSLocalizedString("Close", comment: ""), style: .cancel, handler: nil)
+        // 取消按钮 蓝色
+        let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: nil)
 
         // 添加按钮，iOS 会自动按照规范排列
         alert.addAction(confirmAction)

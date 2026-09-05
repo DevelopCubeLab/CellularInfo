@@ -85,6 +85,21 @@ class LockNetworkModeViewController: UIViewController, UITableViewDelegate, UITa
             for: .valueChanged
         )
         
+        // 额外判断下双卡设备卡槽1未启用卡槽2启用的情况
+        if slotCount > 1 {
+            // 如果卡槽1未启用，卡槽2启用，则切换到卡槽2 否则还是保留在卡槽1
+            if !cellularDataController.getDeviceSlotEnabled(slotID: 1) && cellularDataController.getDeviceSlotEnabled(slotID: 2) {
+                slotID = 2
+                slotSegmentedControl.selectedSegmentIndex = slotID - 1
+            } else if cellularDataController.getDeviceSlotEnabled(slotID: 1) && cellularDataController.getDeviceSlotEnabled(slotID: 2) {
+                // 如果卡1 卡2都启用了，则切换到首选流量卡的卡槽
+                if cellularDataController.getDataPreferredSlotID() > 0 { // 防止无权限的情况
+                    slotID = cellularDataController.getDataPreferredSlotID()
+                    slotSegmentedControl.selectedSegmentIndex = slotID - 1
+                }
+            }
+        }
+        
         // 顶部选择器的容器View
         topContainerView = UIView()
         topContainerView.backgroundColor = .clear // 暂时不设置分组选择器容器的背景颜色

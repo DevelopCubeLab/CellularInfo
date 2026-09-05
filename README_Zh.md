@@ -10,7 +10,7 @@
 </p>
 
 [⬅️ English](https://github.com/DevelopCubeLab/CellularInfo)
- 
+
 ## 项目介绍
 
 本应用是一款面向iOS的蜂窝网络诊断与分析工具，可查询多达 **160+** 项来自CoreTelephony及系统底层的蜂窝网络数据。
@@ -22,8 +22,8 @@
 不支持不具备蜂窝通信能力的设备，包括 iPod Touch、Wi-Fi 版 iPad、Xcode模拟器以及虚拟机环境（例如 VPhone）。  
 
 需要越狱或TrollStore安装，开发者证书签名安装可获取少部分数据  
-  
-本项目不会支持iOS 12.0以下系统版本，因为`CoreTelephonyClient`需要iOS 12.0+
+
+本项目**不会**支持iOS 12.0以下系统版本，因为`CoreTelephonyClient`需要iOS 12.0+
 
 本工具主要面向开发者、安全研究人员以及对 iOS 蜂窝网络机制有深入需求的高级用户。为了保证您的设备数据安全，请勿在非官方来源下载此项目的安装包，app内的数据请勿在未受保护的情况下发送给他人。
 
@@ -47,11 +47,11 @@
 
 | 系统版本 | 安装方法 | 备注 |
 |----------|------|------|
-| iOS 17.0+ 暂时无法越狱设备 | 开发者证书签名安装([数据受限](#10-无需额外权利可以查询的数据)) | 使用AltStore、SideStore、LiveContainer、LCSign、Esign等各类签名工具均可安装 | 
-| iOS 17.0+ 可越狱设备(A10 / A11) | 越狱+TrollStore Lite安装 | - | 
-| iOS 14.0 - iOS 16.6.1 和 iOS 17.0  | 使用TrollStore安装 | - | 
-| iOS 12.2 - iOS 13.x | 越狱安装 | 需要单独安装RootHelper | 
-| iOS 12.0 - iOS 12.1.x | 越狱安装 | 需要选择支持iOS 12.0的ipa文件安装，需要单独安装RootHelper | 
+| iOS 17.3.1/iOS 18.7.2+/iOS 26.0.1+ 暂时无法越狱设备 | 开发者证书签名安装([数据受限](#10-无需额外权利可以查询的数据)) | 使用AltStore、SideStore、LiveContainer、LCSign、Esign等各类签名工具均可安装 |
+| iOS 17.0+ 可越狱设备 | 越狱(Dopamine/Realxin/palera1n)+TrollStore Lite安装 | - |
+| iOS 14.0 - iOS 16.6.1 和 iOS 17.0  | 使用TrollStore安装 | - |
+| iOS 12.2 - iOS 13.x | 越狱安装 | 需要单独安装RootHelper |
+| iOS 12.0 - iOS 12.1.x | 越狱安装 | 需要选择支持iOS 12.0的ipa文件安装，需要单独安装RootHelper |
 
 ## 工作原理
 <img width="800" alt="How CellularInfo Works" src="https://github.com/user-attachments/assets/40729eb6-c84b-4723-a948-0a69c21cc4ea" />
@@ -131,6 +131,7 @@
 * 蜂窝数据卡列表 **(iOS 14以下设备读取数据失败)**
 * 蜂窝数据卡详细信息 **(iOS 14以下设备读取数据失败)**
 * 启用或关闭蜂窝数据卡 **(iOS 14以下设备读取数据失败)**
+* 设置网络频段(Beta)
 
 ### 7. 以下功能或数据需要 iOS 13.4+
 >
@@ -168,16 +169,16 @@
 ### 10. 无需额外权利可以查询的数据
 >
 * 设备是否支持蜂窝网络
-* 设备是否SIM卡已就绪**（iOS 16.4及以上版本）**
+* 设备是否SIM卡已就绪 **（iOS 16.4及以上版本）**
 * 蜂窝网络开关状态
 * 蜂窝网络连接状态
 * 基带候选(RC)版本固件
 * 需要设置eSIM状态
 * 需要显示eSIM漫游提示
-* 运营商名称**（iOS 16.4以下版本）**
-* SIM卡的移动国家代码(MCC)**（iOS 16.4以下版本）**
-* SIM卡的移动网络代码(MNC)**（iOS 16.4以下版本）**
-* SIM卡允许使用PIN锁定**（iOS 18.0以下版本）**
+* 运营商名称 **（iOS 16.4以下版本）**
+* SIM卡的移动国家代码(MCC) **（iOS 16.4以下版本）**
+* SIM卡的移动网络代码(MNC) **（iOS 16.4以下版本）**
+* SIM卡允许使用PIN锁定 **（iOS 18.0以下版本）**
 * 网络制式
 * 5G SA(NR) 连接状态
 * 5GA 连接状态
@@ -197,7 +198,7 @@
 * 数据模式 **(原始数据)**
 * Packet Context Count **(原始数据)**
 * Should Show Branded Calling Info **(原始数据)**
-* 设备是否支持专用承载**(数据不可靠)**
+* 设备是否支持专用承载 **(数据不可靠)**
 * IPCC(运营商配置文件)兼容性检测 **(基本检测)**
 
 ### 11. 需要public-cellular-plan权利可以查询的数据
@@ -224,13 +225,14 @@
 * iOS 16.6 iPhone SE 3 (2022) **(有运营商锁)**
 * iOS 16.6 iPhone 13 Pro
 * iOS 17.0 iPhone 13 mini
-* iOS 17.2 iPad 7 (2019) Wi-Fi + Cellular **(越狱)**
+* iOS 18.7.9 iPad 7 (2019) Wi-Fi + Cellular **(越狱)**
 * iOS 18.7 iPhone 16 Pro Max **(无权利)**
 * iOS 18.7.1 iPhone 16 Pro Max **(无权利)**
 * iOS 26.1 iPhone 17 Pro Max **(无权利)**
 * iOS 26.1 iPhone 17 Pro **(无权利)**
 * iOS 26.1 iPhone 17 Air **(无权利)**  
   
+
 **内测组成员设备**  
 
 * iOS 16.5 iPhone 14 Pro Max

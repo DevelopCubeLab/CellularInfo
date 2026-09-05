@@ -26,6 +26,9 @@ class SettingsUtils {
         case lockNetworkModeStatus
         case lockNetworkModeEntryTips
         case lockNetworkModeAlert
+        case showConfigureNetworkBands
+        case showConfigureNetworkBandsEntryTips
+        case configureNetworkBandsAlert
         
         var key: String {
             switch self {
@@ -44,6 +47,9 @@ class SettingsUtils {
             case .lockNetworkModeStatus: return "LockNetworkModeStatus"
             case .lockNetworkModeEntryTips: return "LockNetworkModeEntryTips"
             case .lockNetworkModeAlert: return "LockNetworkModeAlert"
+            case .showConfigureNetworkBands: return "ShowConfigureNetworkBands"
+            case .showConfigureNetworkBandsEntryTips: return "ShowConfigureNetworkBandsEntryTips"
+            case .configureNetworkBandsAlert: return "ConfigureNetworkBandsAlert"
             }
         }
     }
@@ -329,6 +335,39 @@ class SettingsUtils {
         }
     }
     
+    /// 获取是否显示设置网络频段
+    func getShowConfigureNetworkBands() -> Bool {
+        return plistManager.getBool(key: SettingItem.showConfigureNetworkBands.key, defaultValue: true)
+    }
+    
+    /// 设置是否显示设置网络频段
+    func setShowConfigureNetworkBands(show: Bool) {
+        plistManager.setBool(key: SettingItem.showConfigureNetworkBands.key, value: show)
+        plistManager.apply()
+    }
+    
+    /// 获取是否显示设置网络频段进入提示
+    func getShowConfigureNetworkBandsEntryTips() -> Bool {
+        return plistManager.getBool(key: SettingItem.showConfigureNetworkBandsEntryTips.key, defaultValue: true)
+    }
+    
+    /// 设置是否显示设置网络频段进入提示
+    func setShowConfigureNetworkBandsEntryTips(show: Bool) {
+        plistManager.setBool(key: SettingItem.showConfigureNetworkBandsEntryTips.key, value: show)
+        plistManager.apply()
+    }
+    
+    /// 获取是否显示设置网络频段时的弹窗
+    func getShowConfigureNetworkBandsAlert() -> Bool {
+        return plistManager.getBool(key: SettingItem.configureNetworkBandsAlert.key, defaultValue: true)
+    }
+    
+    /// 设置是否显示设置网络频段时的弹窗
+    func setShowConfigureNetworkBandsAlert(show: Bool) {
+        plistManager.setBool(key: SettingItem.configureNetworkBandsAlert.key, value: show)
+        plistManager.apply()
+    }
+    
     /// 重设全部警告
     func resetAllWarning() {
         // 重新显示安装IPCC前的提示
@@ -337,6 +376,8 @@ class SettingsUtils {
         plistManager.remove(key: SettingItem.lockNetworkModeStatus.key)
         plistManager.remove(key: SettingItem.lockNetworkModeEntryTips.key)
         plistManager.remove(key: SettingItem.lockNetworkModeAlert.key)
+        plistManager.remove(key: SettingItem.showConfigureNetworkBandsEntryTips.key)
+        plistManager.remove(key: SettingItem.configureNetworkBandsAlert.key)
         plistManager.apply()
     }
 }

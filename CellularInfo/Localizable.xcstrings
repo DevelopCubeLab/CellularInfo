@@ -1537,6 +1537,38 @@
         }
       }
     },
+    "ConfigureNetworkBands" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configure Network Bands (Beta)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设置网络频段(Beta)"
+          }
+        }
+      }
+    },
+    "ConfigureNetworkBandsEntryTipsMessage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“Configure Network Bands” is currently a beta feature intended primarily for advanced users to manually adjust the device’s cellular network band configuration.\n\nPlease note:\n\n⚠️ Please configure the network bands according to the bands supported by your region and mobile carrier. Incorrect band settings may cause network issues, prevent the device from registering on the network, or result in “No Service.” If you encounter any issues, you can use “Restore Default Settings” to restore the device’s default network band configuration.\n\n⚠️ Do not disable all bands for a particular network technology, as this may cause VoLTE, VoNR, voice calls, or SMS to malfunction.\n\nOnce configured, the network band settings will remain in effect even after restarting the device. However, if you perform an IPCC update or Restore Default IPCC operation, the system will reapply the default network band configuration.\n\nThis feature does not directly cause physical damage to the device hardware. However, incorrect network band settings may affect cellular connectivity and communication functions. Any risks arising from the use of this feature are assumed by the user.\n\nIf you do not accept these risks, or if you opened this screen by mistake, please tap “Exit.” The application will automatically close this tool and hide its entry point."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“设置网络频段”目前为测试版功能，主要面向专业用户，用于手动调整设备的网络频段配置。\n\n请注意：\n\n⚠️ 请根据您所在区域及所使用运营商的网络频段配置进行设置。错误的频段设置可能导致网络异常、无法注册网络或出现“无服务”等情况。如遇到异常，可使用“恢复默认设置”恢复设备默认的网络频段配置。\n\n⚠️ 请勿取消某一网络制式的全部频段，否则可能导致 VoLTE、VoNR、语音通话或短信等功能异常。\n\n设置完成后，即使重启设备，频段设置仍会保持。如果执行 IPCC 更新或恢复默认 IPCC 等操作，系统将重新应用默认的网络频段配置。\n\n本功能不会直接对设备硬件造成物理损坏，但错误的网络频段设置可能影响设备的蜂窝网络及通信功能，相关风险需由用户自行承担。\n\n如果您无法接受上述风险，或误进入当前界面，请点击“退出”。应用程序将自动关闭该工具并隐藏入口。"
+          }
+        }
+      }
+    },
     "Confirm" : {
       "localizations" : {
         "en" : {
@@ -1889,6 +1921,22 @@
         }
       }
     },
+    "DefaultNetworkBandRestored" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default network band restored"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已恢复默认网络频段"
+          }
+        }
+      }
+    },
     "DefaultVoice" : {
       "localizations" : {
         "en" : {
@@ -1981,6 +2029,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "删除IPCC成功"
+          }
+        }
+      }
+    },
+    "DeselectAll" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deselect All"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消全选"
           }
         }
       }
@@ -2814,6 +2878,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "显示设备是否处于工厂调试模式的内部标识，遗憾的是我们并不知道如何启用它"
+          }
+        }
+      }
+    },
+    "FailedRestoreDefaultNetworkBand" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to restore default network band"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "恢复默认网络频段失败"
           }
         }
       }
@@ -4658,6 +4738,22 @@
         }
       }
     },
+    "NotSelected" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not Selected"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未选择"
+          }
+        }
+      }
+    },
     "NotSet" : {
       "localizations" : {
         "en" : {
@@ -5746,6 +5842,22 @@
         }
       }
     },
+    "RefreshAnyway" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh Anyway"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "继续刷新"
+          }
+        }
+      }
+    },
     "RefreshCarrierBundles" : {
       "localizations" : {
         "en" : {
@@ -6104,6 +6216,38 @@
         }
       }
     },
+    "RestoreDefaultActiveBandsWarningMessage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to restore the network band settings of the selected slot?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "确定恢复所选卡槽的网络频段设置?"
+          }
+        }
+      }
+    },
+    "RestoreDefaultSettings" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore Default Settings"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "恢复默认设置"
+          }
+        }
+      }
+    },
     "RestoreIPCCToSystem" : {
       "localizations" : {
         "en" : {
@@ -6392,6 +6536,22 @@
         }
       }
     },
+    "SaveActiveBandsWarningMessage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save the current network band settings?\nIncorrect band settings may cause cellular network issues, such as “No Service”."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存当前设定的网络频段设置?\n错误的频段设置可能会导致蜂窝网络出现“无服务”等异常情况。"
+          }
+        }
+      }
+    },
     "SavedSIMRecord" : {
       "localizations" : {
         "en" : {
@@ -6468,6 +6628,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "可选择的蜂窝数据卡: %@"
+          }
+        }
+      }
+    },
+    "SelectAll" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select All"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全选"
+          }
+        }
+      }
+    },
+    "Selected" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selected"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已选择"
           }
         }
       }
@@ -8101,6 +8293,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "无锁"
+          }
+        }
+      }
+    },
+    "UnsavedChangesRefreshMessage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You have unsaved network band settings. Continuing will discard these changes. Do you want to continue?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当前有尚未保存的网络频段设置。继续刷新将丢失这些设置，是否继续？"
           }
         }
       }

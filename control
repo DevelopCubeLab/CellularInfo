@@ -1,9 +1,9 @@
 Package: com.developlab.cellularinfo
 Name: CellularInfo
-Version: 1.0
+Version: 1.1
 Architecture: iphoneos-arm
 Description: Cellular information
 Maintainer: developlab
 Author: developlab
 Section: Utilities
-Depends: firmware (< 14.0) | ${LIBSWIFT}
+Depends: firmware (<< 14.0) | firmware (>> 16.6.1)

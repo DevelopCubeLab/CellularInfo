@@ -1,5 +1,5 @@
 ARCHS := arm64
-TARGET := iphone:clang:latest:14.0
+TARGET := iphone:clang:latest:12.0
 
 INSTALL_TARGET_PROCESSES = CellularInfo
 
@@ -11,7 +11,7 @@ before-all::
 
 # 使用 Xcode 项目构建
 XCODEPROJ_NAME = CellularInfo
-BUILD_VERSION = "1.0"
+BUILD_VERSION = "1.1"
 FILE_NAME = "com.developlab.cellularinfo"
 
 # 指定 Theos 使用 xcodeproj 规则

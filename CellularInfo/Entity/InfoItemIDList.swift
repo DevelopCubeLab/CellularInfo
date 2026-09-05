@@ -216,10 +216,11 @@ enum CellularDataItemGroupID {
     static let IPCCFileInfo = 10
     static let IPCCCompatibility = 11
     static let activationTicket = 12
-    static let setNetworkMode = 13
+    static let NetworkTools = 13
     static let networkModeInfo = 14
     static let networkModeSelect = 15
     static let maintenance = 16
+    static let networkBands = 17
 }
 
 // 操作item的ID
@@ -235,6 +236,7 @@ enum ActionItemID {
     static let IPCCManager = -15
     static let IPCCCompatibilityCheck = -16
     static let SettingNetworkMode = -17
+    static let SettingNetworkBand = -18
     static let installIPCC = -18
     static let restoreIPCCToSystem = -19
     static let refreshCarrierBundles = -20

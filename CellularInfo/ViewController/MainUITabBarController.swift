@@ -14,6 +14,11 @@ class MainUITabBarController: UITabBarController {
             self.view.backgroundColor = .white
         }
         
+        // 隐藏iPad OS 18开始的顶部TabBar
+        if #available(iOS 18.0, *), UIDevice.current.userInterfaceIdiom == .pad {
+            setOverrideTraitCollection(UITraitCollection(horizontalSizeClass: .compact), forChild: self)
+        }
+        
         // 卡槽信息的ViewController
         let cellularDataViewController = CellularDataViewController()
         if #available(iOS 13.0, *) {
@@ -109,7 +114,9 @@ class MainUITabBarController: UITabBarController {
         // 按照不同系统版本来设置背景颜色
         var backgroundColor = UIColor.systemBlue.withAlphaComponent(0.7)
         
-        if #available(iOS 26.0, *) { // iOS 26 配色
+        if #available(iOS 27.0, *) { // iOS 27 配色
+            backgroundColor = UIColor.systemGray.withAlphaComponent(0.6)
+        } else if #available(iOS 26.0, *) { // iOS 26 配色
             backgroundColor = UIColor.systemIndigo.withAlphaComponent(0.6)
         } else if #available(iOS 18.0, *) { // iOS 18 配色
             backgroundColor = UIColor.systemYellow.withAlphaComponent(0.7)

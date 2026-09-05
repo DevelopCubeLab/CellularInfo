@@ -31,7 +31,7 @@ class CellularDataController {
     private var deviceTypeBaseBand: UIUserInterfaceIdiom?
     // 获取设备是否支持安装eSIM 因为比较耗时 把结果保存
     private var allowInstallESIM: Bool = false
-    private var allowInstallESIMCacheTime: Int = 0
+    private var hasAllowInstallESIMResult: Bool = false
     // 数据刷新的时间 防止短时间内频繁发送更新UI的通知
     private var lastNotifyTime: TimeInterval = 0
     
@@ -176,6 +176,30 @@ class CellularDataController {
             return try coreTelephonyController.getActiveContexts().count
         } catch {
             return 0
+        }
+    }
+    
+    // 获取设备卡槽是否未启用
+    func getDeviceSlotEnabled(slotID: Int) -> Bool {
+        
+        if slotID < 0 || slotID > 2 { // 去除不存在的卡槽情况
+            return false
+        }
+        if slotID > getSlotCount() { // 查询的卡槽位不能超过设备卡槽数量
+            return false
+        }
+        if let context = coreTelephonyController.getServiceSubscriptionFullyContext(slotID: slotID) ?? coreTelephonyController.getServiceSubscriptionContext(slot: slotID) {
+            return getSlotEnableSIM(context: context)
+        }
+        return false
+    }
+    
+    // 获取当前首选卡槽的ID
+    func getDataPreferredSlotID() -> Int {
+        do {
+            return Int(try coreTelephonyController.getDataPreferredSlotID())
+        } catch {
+            return -1
         }
     }
     
@@ -545,7 +569,7 @@ class CellularDataController {
     func getAllowInstallEmbeddedSIMItem(onUpdate: @escaping (InfoItem) -> Void) -> InfoItem {
         
         // 1. 先看下有没有缓存
-        if allowInstallESIMCacheTime > 0 {
+        if hasAllowInstallESIMResult {
             // 判断是否有权限
             if !AppCapability.hasCommCenterPublicCellularPlan() {
                 return InfoItem(
@@ -579,7 +603,16 @@ class CellularDataController {
         )
         
         // 3. 异步查询
-        coreTelephonyController.getDeviceAllowInstallEmbeddedSIM { allowed in
+        coreTelephonyController.getDeviceAllowInstallEmbeddedSIM {  [weak self] allowed in
+            
+            guard let self = self else {
+                return
+            }
+            
+            // 设置缓存
+            self.allowInstallESIM = allowed
+            self.hasAllowInstallESIMResult = true
+            
             let updated = InfoItem(
                 id: CoreTelephonyItemID.allowInstallEmbeddedSIM,
                 text: String.localizedStringWithFormat(
@@ -588,9 +621,7 @@ class CellularDataController {
                 ),
                 hintText: NSLocalizedString("AllowInstallEmbeddedSIMHint", comment: "")
             )
-            // 设置一个缓存
-            self.allowInstallESIM = allowed
-            self.allowInstallESIMCacheTime = Int(Date().timeIntervalSince1970)
+            
             // 更新item
             onUpdate(updated)
         }
@@ -674,30 +705,37 @@ class CellularDataController {
     
     /// 获取首选网络卡槽选择的网络类型
     func getPreferredDataSelectRateInfo() -> InfoItem? {
-        if let context = coreTelephonyController.getDataPreferredContext() {
+        do {
+            let context = try coreTelephonyController.getDataPreferredContext()
             return InfoItem(
                 id: CommonItemID.dataSIMNetworkType,
                 text: String.localizedStringWithFormat(NSLocalizedString("DataSIMNetworkType", comment: ""), getRateText(radioGeneration: getSlotSelectRate(context: context), indicator4GText: coreTelephonyController.getSlot4GIndicatorText(context: context)))
             )
+        } catch {
+            return nil
         }
-        return nil
     }
     
     /// 获取首选蜂窝网络卡信息
     func getPreferredDataSlotInfo() -> InfoItem? {
-        if let context = coreTelephonyController.getDataPreferredContext(), let label = context.label {// 不能强制解包 否则iOS 14以下设备闪退 获取不到label
-            // 单卡或者iPad蜂窝版显示的Label是有问题的，所以隐藏掉
-            if (try? coreTelephonyController.getSlotShortLabelText(context: context)) == nil { // 通过这个方法排除iPad或者纯单卡槽的机器
-                return InfoItem(
-                    id: CommonItemID.preferredDataSlot,
-                    text: String.localizedStringWithFormat(NSLocalizedString("PreferredDataSlot", comment: ""), String.localizedStringWithFormat(NSLocalizedString("SlotNumber", comment: ""), context.slotID))
-                )
-            } else {
-                return InfoItem(
-                    id: CommonItemID.preferredDataSlot,
-                    text: String.localizedStringWithFormat(NSLocalizedString("PreferredDataSlotNumber", comment: ""), context.slotID, label)
-                )
+        do {
+            let context = try coreTelephonyController.getDataPreferredContext()
+            if let label = context.label {// 不能强制解包 否则iOS 14以下设备闪退 获取不到label
+                // 单卡或者iPad蜂窝版显示的Label是有问题的，所以隐藏掉
+                if (try? coreTelephonyController.getSlotShortLabelText(context: context)) == nil { // 通过这个方法排除iPad或者纯单卡槽的机器
+                    return InfoItem(
+                        id: CommonItemID.preferredDataSlot,
+                        text: String.localizedStringWithFormat(NSLocalizedString("PreferredDataSlot", comment: ""), String.localizedStringWithFormat(NSLocalizedString("SlotNumber", comment: ""), context.slotID))
+                    )
+                } else {
+                    return InfoItem(
+                        id: CommonItemID.preferredDataSlot,
+                        text: String.localizedStringWithFormat(NSLocalizedString("PreferredDataSlotNumber", comment: ""), context.slotID, label)
+                    )
+                }
             }
+        } catch {
+            return nil
         }
         return nil
     }
@@ -727,7 +765,7 @@ class CellularDataController {
                 }
                 
             } catch let error as NSError {
-                if error.code == 1 {
+                if error.code == 1 || error.code == 13 {
                     return InfoItem(
                         id: CommonItemID.defaultVoiceSlot,
                         text: String.localizedStringWithFormat(NSLocalizedString("DefaultVoice", comment: ""), NSLocalizedString("NoPermission", comment: ""))
@@ -924,9 +962,10 @@ class CellularDataController {
     
     /// 获取当前首选卡槽的网络类型
     func getDataPreferenceSlotRadioAccessTechnology() -> CoreTelephonyEnumMapper.RadioGeneration {
-        if let dataPrefContext = coreTelephonyController.getDataPreferredContext() {
+        do {
+            let dataPrefContext = try coreTelephonyController.getDataPreferredContext()
             return getSlotRadioAccessTechnologyGeneration(context: dataPrefContext)
-        } else {
+        } catch {
             return .unknown
         }
     }
@@ -5748,7 +5787,7 @@ class CellularDataController {
     func getLockNetworkModeGroup(slotID: Int) -> [InfoItemGroup] {
         var lockNetworkModeGroup: [InfoItemGroup] = []
         
-        // 第一组 基本信息
+        // 第一组 设备基本信息
         let basicInfoGroup = InfoItemGroup(id: CellularDataItemGroupID.deviceBaseInfo)
         basicInfoGroup.addItem(getDeviceBasicInfo())
         lockNetworkModeGroup.append(basicInfoGroup)
@@ -5757,66 +5796,76 @@ class CellularDataController {
         if let context = coreTelephonyController.getServiceSubscriptionFullyContext(slotID: slotID) ?? coreTelephonyController.getServiceSubscriptionContext(slot: slotID),
            let descriptor = coreTelephonyController.getServiceDescriptor(slotID: slotID) {
             
+            // 获取当前卡槽是否已经启用
+            let slotEnabled = getSlotEnableSIM(context: context)
+            
             let networkModeInfoGroup = InfoItemGroup(id: CellularDataItemGroupID.networkModeInfo)
-            networkModeInfoGroup.addItem(getSlotCarrierName(context: context))
-            networkModeInfoGroup.addItem(getSlotLocalizedOperatorName(context: context))
-            networkModeInfoGroup.addItem(getSlotSignalStrengthInfo(context: context))
-            networkModeInfoGroup.addItem(getSlotRadioAccessTechnologyInfo(slotID: slotID, context: context))
-            networkModeInfoGroup.addItems(getSlotRatSectionInfo(descriptor: descriptor, context: context))
+            if slotEnabled { // 已启用SIM卡的时候再放入数据
+                networkModeInfoGroup.addItem(getSlotCarrierName(context: context))
+                networkModeInfoGroup.addItem(getSlotLocalizedOperatorName(context: context))
+                networkModeInfoGroup.addItem(getSlotSignalStrengthInfo(context: context))
+                networkModeInfoGroup.addItem(getSlotRadioAccessTechnologyInfo(slotID: slotID, context: context))
+                networkModeInfoGroup.addItems(getSlotRatSectionInfo(descriptor: descriptor, context: context))
+            } else { // 无SIM卡/未启用SIM卡时直接显示无SIM卡/未启用SIM卡
+                networkModeInfoGroup.addItem(getSlotSIMStatus(context: context))
+            }
+            
             lockNetworkModeGroup.append(networkModeInfoGroup)
             
-            // 第三组 可选的设定
-            let networkTypeGroup = InfoItemGroup(id: CellularDataItemGroupID.networkModeSelect)
-            networkTypeGroup.titleText = NSLocalizedString("Setting", comment: "")
-            networkTypeGroup.addItem(InfoItem(id: ActionItemID.selectNetworkMode, text: NSLocalizedString("AutomaticSelectNetworkMode", comment: ""), detailText: "kCTRegistrationRATSelectionAutomatic"))
-            networkTypeGroup.addItem(InfoItem(id: ActionItemID.selectNetworkModeUnknown, text: NSLocalizedString("UnknownNetworkMode", comment: "未知网络类型"), detailText: "kCTRegistrationRATSelectionUnknown"))
-            networkTypeGroup.addItem(InfoItem(id: ActionItemID.selectNetworkMode, text: NSLocalizedString("MultiNetworkMode", comment: ""), detailText: "kCTRegistrationRATSelectionDual"))
-            
-            lockNetworkModeGroup.append(networkTypeGroup)
-            
-            do {
-                if try coreTelephonyController.getDeviceSupports5G() { // 支持5G的设备再去放5G网络的选择，不然瞎捣乱呢
-                    // 5G分组
-                    let networkType5GGroup = InfoItemGroup(id: CellularDataItemGroupID.networkModeSelect)
-                    networkType5GGroup.titleText = "5G"
-                    networkType5GGroup.addItem(InfoItem(id: ActionItemID.selectNetworkMode, text: "5G (SA+NSA)", detailText: "kCTRegistrationRATSelectionNR"))
-                    networkType5GGroup.addItem(InfoItem(id: ActionItemID.selectNetworkMode, text: "5G (SA)", detailText: "kCTRegistrationRATSelectionNRNonStandAlone"))
-                    networkType5GGroup.addItem(InfoItem(id: ActionItemID.selectNetworkMode, text: "5G (NSA)", detailText: "kCTRegistrationRATSelectionNRNonStandAlone"))
-                    
-                    lockNetworkModeGroup.append(networkType5GGroup)
+            if slotEnabled { // 已启用SIM卡的时候再放入数据
+                // 第三组 可选的设定
+                let networkTypeGroup = InfoItemGroup(id: CellularDataItemGroupID.networkModeSelect)
+                networkTypeGroup.titleText = NSLocalizedString("Setting", comment: "")
+                networkTypeGroup.addItem(InfoItem(id: ActionItemID.selectNetworkMode, text: NSLocalizedString("AutomaticSelectNetworkMode", comment: ""), detailText: "kCTRegistrationRATSelectionAutomatic"))
+                networkTypeGroup.addItem(InfoItem(id: ActionItemID.selectNetworkModeUnknown, text: NSLocalizedString("UnknownNetworkMode", comment: "未知网络类型"), detailText: "kCTRegistrationRATSelectionUnknown"))
+                networkTypeGroup.addItem(InfoItem(id: ActionItemID.selectNetworkMode, text: NSLocalizedString("MultiNetworkMode", comment: ""), detailText: "kCTRegistrationRATSelectionDual"))
+                
+                lockNetworkModeGroup.append(networkTypeGroup)
+                
+                do {
+                    if try coreTelephonyController.getDeviceSupports5G() { // 支持5G的设备再去放5G网络的选择，不然瞎捣乱呢
+                        // 5G分组
+                        let networkType5GGroup = InfoItemGroup(id: CellularDataItemGroupID.networkModeSelect)
+                        networkType5GGroup.titleText = "5G"
+                        networkType5GGroup.addItem(InfoItem(id: ActionItemID.selectNetworkMode, text: "5G (SA+NSA)", detailText: "kCTRegistrationRATSelectionNR"))
+                        networkType5GGroup.addItem(InfoItem(id: ActionItemID.selectNetworkMode, text: "5G (SA)", detailText: "kCTRegistrationRATSelectionNRNonStandAlone"))
+                        networkType5GGroup.addItem(InfoItem(id: ActionItemID.selectNetworkMode, text: "5G (NSA)", detailText: "kCTRegistrationRATSelectionNRNonStandAlone"))
+                        
+                        lockNetworkModeGroup.append(networkType5GGroup)
+                    }
+                } catch {
+                    //
                 }
-            } catch {
-                //
+                
+                // 4G分组
+                let networkType4GGroup = InfoItemGroup(id: CellularDataItemGroupID.networkModeSelect)
+                networkType4GGroup.titleText = "4G/LTE"
+                networkType4GGroup.addItem(InfoItem(id: ActionItemID.selectNetworkMode, text: "4G (LTE)", detailText: "kCTRegistrationRATSelectionNRNonStandAlone"))
+                lockNetworkModeGroup.append(networkType4GGroup)
+                
+                // 判断设备是否支持CDMA
+                let supportsCDMA: Bool = coreTelephonyController.getDeviceMEID() != nil
+                
+                // 3G分组
+                let networkType3GGroup = InfoItemGroup(id: CellularDataItemGroupID.networkModeSelect)
+                networkType3GGroup.titleText = "3G"
+                networkType3GGroup.addItem(InfoItem(id: ActionItemID.selectNetworkMode, text: "3G (UMTS/WCDMA)", detailText: "kCTRegistrationRATSelectionUMTS"))
+                networkType3GGroup.addItem(InfoItem(id: ActionItemID.selectNetworkMode, text: "3G (TD-SCDMA)", detailText: "kCTRegistrationRATSelectionTDSCDMA"))
+                if supportsCDMA {
+                    networkType3GGroup.addItem(InfoItem(id: ActionItemID.selectNetworkMode, text: "3G (CDMA EV-DO)", detailText: "kCTRegistrationRATSelectionCDMA1xEVDO"))
+                    networkType3GGroup.addItem(InfoItem(id: ActionItemID.selectNetworkMode, text: "3G (CDMA Hybrid)", detailText: "kCTRegistrationRATSelectionCDMAHybrid"))
+                }
+                lockNetworkModeGroup.append(networkType3GGroup)
+                
+                // 2G分组
+                let networkType2GGroup = InfoItemGroup(id: CellularDataItemGroupID.networkModeSelect)
+                networkType2GGroup.titleText = "2G"
+                networkType2GGroup.addItem(InfoItem(id: ActionItemID.selectNetworkMode, text: "2G (GSM)", detailText: "kCTRegistrationRATSelectionGSM"))
+                if supportsCDMA {
+                    networkType2GGroup.addItem(InfoItem(id: ActionItemID.selectNetworkMode, text: "2G (CDMA 1x)", detailText: "kCTRegistrationRATSelectionCDMA1x"))
+                }
+                lockNetworkModeGroup.append(networkType2GGroup)
             }
-            
-            // 4G分组
-            let networkType4GGroup = InfoItemGroup(id: CellularDataItemGroupID.networkModeSelect)
-            networkType4GGroup.titleText = "4G/LTE"
-            networkType4GGroup.addItem(InfoItem(id: ActionItemID.selectNetworkMode, text: "4G (LTE)", detailText: "kCTRegistrationRATSelectionNRNonStandAlone"))
-            lockNetworkModeGroup.append(networkType4GGroup)
-            
-            // 判断设备是否支持CDMA
-            let supportsCDMA: Bool = coreTelephonyController.getDeviceMEID() != nil
-            
-            // 3G分组
-            let networkType3GGroup = InfoItemGroup(id: CellularDataItemGroupID.networkModeSelect)
-            networkType3GGroup.titleText = "3G"
-            networkType3GGroup.addItem(InfoItem(id: ActionItemID.selectNetworkMode, text: "3G (UMTS/WCDMA)", detailText: "kCTRegistrationRATSelectionUMTS"))
-            networkType3GGroup.addItem(InfoItem(id: ActionItemID.selectNetworkMode, text: "3G (TD-SCDMA)", detailText: "kCTRegistrationRATSelectionTDSCDMA"))
-            if supportsCDMA {
-                networkType3GGroup.addItem(InfoItem(id: ActionItemID.selectNetworkMode, text: "3G (CDMA EV-DO)", detailText: "kCTRegistrationRATSelectionCDMA1xEVDO"))
-                networkType3GGroup.addItem(InfoItem(id: ActionItemID.selectNetworkMode, text: "3G (CDMA Hybrid)", detailText: "kCTRegistrationRATSelectionCDMAHybrid"))
-            }
-            lockNetworkModeGroup.append(networkType3GGroup)
-            
-            // 2G分组
-            let networkType2GGroup = InfoItemGroup(id: CellularDataItemGroupID.networkModeSelect)
-            networkType2GGroup.titleText = "2G"
-            networkType2GGroup.addItem(InfoItem(id: ActionItemID.selectNetworkMode, text: "2G (GSM)", detailText: "kCTRegistrationRATSelectionGSM"))
-            if supportsCDMA {
-                networkType2GGroup.addItem(InfoItem(id: ActionItemID.selectNetworkMode, text: "2G (CDMA 1x)", detailText: "kCTRegistrationRATSelectionCDMA1x"))
-            }
-            lockNetworkModeGroup.append(networkType2GGroup)
             
         }
         
@@ -5841,6 +5890,78 @@ class CellularDataController {
         
         
         
+        return false
+    }
+    
+    /// 获取设置网络频段的基本信息
+    func getConfigureNetworkBandInfoGroup(slotID: Int) -> [InfoItemGroup] {
+        
+        var configureNetworkBandInfoGroup: [InfoItemGroup] = []
+        
+        // 第一组 设备基本信息
+        let basicInfoGroup = InfoItemGroup(id: CellularDataItemGroupID.deviceBaseInfo)
+        basicInfoGroup.addItem(getDeviceBasicInfo())
+        configureNetworkBandInfoGroup.append(basicInfoGroup)
+        
+        // 第二组 当前卡的网络信息
+        if let context = coreTelephonyController.getServiceSubscriptionFullyContext(slotID: slotID) ?? coreTelephonyController.getServiceSubscriptionContext(slot: slotID),
+           let descriptor = coreTelephonyController.getServiceDescriptor(slotID: slotID) {
+            
+            let networkStatusGroup = InfoItemGroup(id: CellularDataItemGroupID.networkBands)
+            
+            if getSlotEnableSIM(context: context) { // 已启用SIM卡的时候再放入数据
+                networkStatusGroup.addItem(getSlotCarrierName(context: context))
+                networkStatusGroup.addItem(getSlotLocalizedOperatorName(context: context))
+                networkStatusGroup.addItem(getSlotSignalStrengthInfo(context: context))
+                networkStatusGroup.addItem(getSlotRadioAccessTechnologyInfo(slotID: slotID, context: context))
+                // 射频信息
+                if let cellInfo = try? coreTelephonyController.getSlotCellInfo(context: context) {
+                    networkStatusGroup.addItemIfPresent(getSlotServingBand(context: context, cellInfo: cellInfo))
+                    networkStatusGroup.addItemIfPresent(getSlotRSRP(descriptor: descriptor))
+                    networkStatusGroup.addItemIfPresent(getSlotSNR(descriptor: descriptor))
+                }
+            } else { // 无SIM卡/未启用SIM卡时直接显示无SIM卡/未启用SIM卡
+                networkStatusGroup.addItem(getSlotSIMStatus(context: context))
+            }
+            
+            configureNetworkBandInfoGroup.append(networkStatusGroup)
+            
+        }
+        
+        return configureNetworkBandInfoGroup
+    }
+    
+    // 获取卡槽的卡的频段信息
+    @available(iOS 14.0, *)
+    func getSlotBandInfo(slotID: Int) throws -> CTBandInfo? {
+        if let context = coreTelephonyController.getServiceSubscriptionFullyContext(slotID: slotID) ?? coreTelephonyController.getServiceSubscriptionContext(slot: slotID) {
+            return try coreTelephonyController.getSlotBandInfo(context: context)
+        }
+        return nil
+    }
+    
+    // 设置卡槽的卡的频段信息
+    @available(iOS 14.0, *)
+    func setSlotActiveBandInfo(slotID: Int, bandInfo: CTBandInfo) throws {
+        if let context = coreTelephonyController.getServiceSubscriptionFullyContext(slotID: slotID) ?? coreTelephonyController.getServiceSubscriptionContext(slot: slotID) {
+            try coreTelephonyController.setSlotActiveBandInfo(context: context, bandInfo: bandInfo)
+        }
+    }
+    
+    /// 恢复卡槽的卡的默认频段设置
+    @available(iOS 14.0, *)
+    func restoreSlotActiveBand(slotID: Int) -> Bool {
+        if let context = coreTelephonyController.getServiceSubscriptionFullyContext(slotID: slotID) ?? coreTelephonyController.getServiceSubscriptionContext(slot: slotID) {
+            
+            do {
+                let bandInfo = try coreTelephonyController.getSlotBandInfo(context: context)
+                bandInfo.fActiveBands = bandInfo.fSupportedBands
+                try coreTelephonyController.setSlotActiveBandInfo(context: context, bandInfo: bandInfo)
+                return true
+            } catch {
+                return false
+            }
+        }
         return false
     }
     

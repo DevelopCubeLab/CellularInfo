@@ -395,11 +395,22 @@ class CoreTelephonyController : NSObject, CoreTelephonyClientDataDelegateInterna
     /// checkEmbeddedSimHealthWithError的返回值 == nil 是设备不支持 会抛异常
     ///                                        != nil 需要看返回值
     ///                                        eSIM被拆除的设备返回 = 0
+    ///                                        错误代码 19 设备不支持
+    ///                                        错误代码 1 无权限
     /// 无低版本系统替代方案
     /// 因为可能设备不支持因此需要抛异常
     @available(iOS 16.0, *)
     func checkDeviceEmbeddedSIMHealth() throws -> Bool {
-        return try coreTelephonyClient.checkEmbeddedSimHealth().boolValue
+        var error: NSError? // 创建一个接收错误信息的对象
+        let result = coreTelephonyClient.checkEmbeddedSimHealthWithError(&error)
+        if let error = error { // 判断是否有错误 有错误就抛异常给上层
+            throw error
+        }
+        if let result = result {
+            return result.boolValue
+        } else {
+            throw NSError(domain: "CoreTelephonyController", code: 19, userInfo: nil)
+        }
     }
     
     /// 激活策略是否允许安装eSIM
@@ -758,8 +769,8 @@ class CoreTelephonyController : NSObject, CoreTelephonyClientDataDelegateInterna
     
     /// 获取当前首选卡槽的context
     /// 获取的context信息是全的
-    func getDataPreferredContext() -> CTXPCServiceSubscriptionContext? {
-        return coreTelephonyClient.getPreferredDataSubscriptionContextSync(nil)
+    func getDataPreferredContext() throws -> CTXPCServiceSubscriptionContext {
+        return try coreTelephonyClient.getPreferredDataSubscriptionContextSync()
     }
     
     /// 获取当前首选语音卡槽的context
@@ -773,8 +784,8 @@ class CoreTelephonyController : NSObject, CoreTelephonyClientDataDelegateInterna
     }
     
     /// 获取当前首选卡槽的ID
-    func getDataPreferredSlotID() -> Int64 {
-        return getDataPreferredContext()?.slotID ?? -1
+    func getDataPreferredSlotID() throws -> Int64 {
+        return try getDataPreferredContext().slotID
     }
     
     /// 通过 domain 获取 CTServiceDescriptorContainer 服务描述的实例
@@ -912,11 +923,7 @@ class CoreTelephonyController : NSObject, CoreTelephonyClientDataDelegateInterna
     /// 返回值 3 = 4G
     /// 返回值 4 = 5G
     func getDataPreferredSlotRate() throws -> Int64 {
-        if let context = getDataPreferredContext() {
-            return try getSlotSelectRate(context: context)
-        } else {
-            return 0
-        }
+        return try getSlotSelectRate(context: try getDataPreferredContext())
     }
     
     /// 获取卡槽支持并且可选择的网络类型
@@ -934,10 +941,7 @@ class CoreTelephonyController : NSObject, CoreTelephonyClientDataDelegateInterna
     /// 返回值 3 = 4G
     /// 返回值 4 = 5G
     func getDataPreferredSlotSupportRates() throws -> [Int64] {
-        if let dataPerfContext = getDataPreferredContext() {
-            return try getSlotSupportRates(context: dataPerfContext)
-        }
-        return []
+        return try getSlotSupportRates(context: try getDataPreferredContext())
     }
     
     /// 获取当前卡槽的卡标签实例
@@ -1939,6 +1943,17 @@ class CoreTelephonyController : NSObject, CoreTelephonyClientDataDelegateInterna
     @available(iOS 14.0, *)
     func getSlotBandInfo(context: CTXPCServiceSubscriptionContext) throws -> CTBandInfo {
         return try coreTelephonyClient.getBandInfo(context)
+    }
+    
+    /// 设置当前卡的频段信息
+    @available(iOS 14.0, *)
+    func setSlotActiveBandInfo(context: CTXPCServiceSubscriptionContext, bandInfo: CTBandInfo) throws {
+        var error: NSError? // 创建一个接收错误信息的对象
+        // 这个方法Swift无法识别这个方法抛异常，只能自己处理异常
+        coreTelephonyClient.setActiveBandInfo(context, bands: bandInfo, error: &error)
+        if let error = error { // 判断是否有错误 有错误就抛异常给上层
+            throw error
+        }
     }
     
     /// 获取当前卡槽的SIM卡联系人数量

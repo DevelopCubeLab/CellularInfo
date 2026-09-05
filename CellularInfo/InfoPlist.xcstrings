@@ -39,6 +39,12 @@
     },
     "IPCC Carrier Bundle" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IPCC Carrier Bundle"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",

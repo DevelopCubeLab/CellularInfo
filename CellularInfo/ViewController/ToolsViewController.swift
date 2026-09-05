@@ -5,6 +5,8 @@ class ToolsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     private var tableView = UITableView()
     
+    private let NetworkToolsAt = 3
+    
     private var tableCellList = [
         InfoItemGroup(id: 0, items: [
             InfoItem(id: ActionItemID.IPCCManager, text: NSLocalizedString("IPCCManager", comment: "")),
@@ -17,6 +19,8 @@ class ToolsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             InfoItem(id: ActionItemID.refreshCellularConnection, text: NSLocalizedString("RefreshCellularConnection", comment: "")),
             InfoItem(id: ActionItemID.rebootCommCenterService, text: NSLocalizedString("RebootCommCenterService", comment: "")),
         ]),
+        InfoItemGroup(id: CellularDataItemGroupID.NetworkTools, items: [
+        ])
     ]
     
     override func viewDidLoad() {
@@ -25,11 +29,10 @@ class ToolsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         title = NSLocalizedString("Tools", comment: "")
         
 #if DEBUG
-        tableCellList.append(
-            InfoItemGroup(id: CellularDataItemGroupID.setNetworkMode, items: [
-                InfoItem(id: ActionItemID.SettingNetworkMode, text: NSLocalizedString("LockNetworkMode", comment: ""))
-            ])
-        )
+        tableCellList[NetworkToolsAt].addItemIfNotExists(InfoItem(id: ActionItemID.SettingNetworkMode, text: NSLocalizedString("LockNetworkMode", comment: "")))
+        if #available(iOS 14.0, *) {
+            tableCellList[NetworkToolsAt].addItemIfNotExists(InfoItem(id: ActionItemID.SettingNetworkBand, text: NSLocalizedString("ConfigureNetworkBands", comment: "")))
+        }
 #endif
         
         // iOS 15 之后的版本使用新的UITableView样式
@@ -78,23 +81,28 @@ class ToolsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         /// 判断是否显示设置网络类型
         if SettingsUtils.instance.getShowLockNetworkMode() {
-            let exists = tableCellList.contains { $0.id == CellularDataItemGroupID.setNetworkMode }
-            if !exists {
-                tableCellList.append(
-                    InfoItemGroup(id: CellularDataItemGroupID.setNetworkMode, items: [
-                        InfoItem(id: ActionItemID.SettingNetworkMode, text: NSLocalizedString("LockNetworkMode", comment: ""))
-                    ])
-                )
-                tableView.reloadData()
-            }
+            tableCellList[NetworkToolsAt].addItemIfNotExists(InfoItem(id: ActionItemID.SettingNetworkMode, text: NSLocalizedString("LockNetworkMode", comment: "")))
+            tableView.reloadData()
         } else {
 #if !DEBUG
             // 删除该分组
-            if let index = tableCellList.firstIndex(where: { $0.id == CellularDataItemGroupID.setNetworkMode }) {
-                tableCellList.remove(at: index)
-                tableView.reloadData()
-            }
+            tableCellList[NetworkToolsAt].removeItems(withID: ActionItemID.SettingNetworkMode)
+            tableView.reloadData()
 #endif
+        }
+        
+        /// 判断是否显示设置网络频段
+        if #available(iOS 14.0, *) {
+            if SettingsUtils.instance.getShowConfigureNetworkBands() {
+                tableCellList[NetworkToolsAt].addItemIfNotExists(InfoItem(id: ActionItemID.SettingNetworkBand, text: NSLocalizedString("ConfigureNetworkBands", comment: "")))
+                tableView.reloadData()
+            } else {
+#if !DEBUG
+                // 删除该分组
+                tableCellList[NetworkToolsAt].removeItems(withID: ActionItemID.SettingNetworkBand)
+                tableView.reloadData()
+#endif
+            }
         }
         
     }
@@ -164,6 +172,12 @@ class ToolsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             let lockNetworkModeViewController = LockNetworkModeViewController()
             lockNetworkModeViewController.hidesBottomBarWhenPushed = true // 隐藏底部导航栏
             self.navigationController!.pushViewController(lockNetworkModeViewController, animated: true)
+        case ActionItemID.SettingNetworkBand: // 设置网络频段
+            if #available(iOS 14.0, *) {
+                let configureNetworkBandsViewController = ConfigureNetworkBandsViewController()
+                configureNetworkBandsViewController.hidesBottomBarWhenPushed = true // 隐藏底部导航栏
+                self.navigationController!.pushViewController(configureNetworkBandsViewController, animated: true)
+            }
         default: break
         }
         
