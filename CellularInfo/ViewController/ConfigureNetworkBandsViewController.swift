@@ -675,15 +675,9 @@ class ConfigureNetworkBandsViewController: UIViewController, UITableViewDelegate
 
             let values = activeBands[ratKey, default: []].sorted()
 
-            if values.isEmpty { // 当前 RAT 一个 Band 都没有选，则从 ActiveBands 中删除整个RAT
-                updatedActiveBands.removeObject(forKey: ratKey)
-            } else {
-                // 把当前 activeBands 写回去。
-                updatedActiveBands[ratKey] = NSMutableArray(array: values.map {
-                    NSNumber(value: $0)
-                })
-                        
-            }
+            updatedActiveBands[ratKey] = NSMutableArray(array: values.map {
+                NSNumber(value: $0)
+            })
         }
 
         // 这里只修改 fActiveBands，fSupportedBands 完全不动。
