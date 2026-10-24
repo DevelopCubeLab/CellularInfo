@@ -1,0 +1,58 @@
+name: Build CellularInfo
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    # The project notes Xcode 27.1 Beta for iOS 15+.
+    # GitHub-hosted runners may not offer this exact beta; verify Xcode availability.
+    runs-on: macos-15
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          xcodebuild -version
+          xcode-select -p
+          brew update
+          brew install ldid dpkg
+
+      - name: Install Theos
+        run: |
+          git clone --recursive https://github.com/theos/theos.git "$HOME/theos"
+          echo "THEOS=$HOME/theos" >> "$GITHUB_ENV"
+          echo "$HOME/theos/bin" >> "$GITHUB_PATH"
+
+      - name: Install iOS SDKs
+        run: |
+          git clone --depth 1 https://github.com/theos/sdks.git "$RUNNER_TEMP/theos-sdks"
+          mkdir -p "$HOME/theos/sdks"
+          cp -R "$RUNNER_TEMP/theos-sdks"/*.sdk "$HOME/theos/sdks/" || true
+          ls "$HOME/theos/sdks"
+
+      - name: Build package
+        shell: bash
+        run: |
+          set -o pipefail
+          make clean
+          make package FINALPACKAGE=1 PACKAGE_FORMAT=ipa
+
+      - name: Collect build outputs
+        if: always()
+        run: |
+          mkdir -p build-output
+          find packages -maxdepth 2 -type f \( -name '*.ipa' -o -name '*.tipa' -o -name '*.dSYM' \) -print -exec cp -R {} build-output/ \; 2>/dev/null || true
+          ls -la build-output
+
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CellularInfo-build-output
+          path: build-output/
+          if-no-files-found: warn
